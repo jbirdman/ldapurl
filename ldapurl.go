@@ -4,6 +4,8 @@ import (
 	"net/url"
 	"errors"
 	"fmt"
+	"net"
+	"strconv"
 )
 
 const (
@@ -15,7 +17,23 @@ type LdapURL struct {
 	Scheme string
 	Host   string
 	Port   int
-	IsTls  bool
+}
+
+func SplitHostPort(hostport string, defaultport int) (host string, port int) {
+	host, portstring, err := net.SplitHostPort(hostport)
+	if err != nil {
+		port = defaultport
+		host = hostport
+		return
+	}
+
+	// Need to convert string port to int
+	port, err = strconv.Atoi(portstring)
+	if err != nil {
+		port = defaultport
+	}
+
+	return
 }
 
 func Parse(rawurl string) (ldapurl *LdapURL, err error) {
@@ -24,18 +42,22 @@ func Parse(rawurl string) (ldapurl *LdapURL, err error) {
 		return
 	}
 
+	host, port := SplitHostPort(u.Host, 0)
+
 	// Start building the object
-	ldapurl = &LdapURL{Scheme:u.Scheme, Host:u.Host, }
+	ldapurl = &LdapURL{Scheme:u.Scheme, Host:host}
 
 	// Check for supported schemes and set port defaults and TLS status appropriately
 	switch u.Scheme {
 	case "ldap":
-		ldapurl.IsTls = false
-		ldapurl.Port = DefaultLdapPort
+		if ldapurl.Port = port; port == 0 {
+			ldapurl.Port = DefaultLdapPort
+		}
 		break
 	case "ldaps":
-		ldapurl.IsTls = true
-		ldapurl.Port = DefaultLdapsPort
+		if ldapurl.Port = port; port == 0 {
+			ldapurl.Port = DefaultLdapsPort
+		}
 		break
 	default:
 		err = errors.New(fmt.Sprintf("Unsupported LDAP URL scheme: %s", u.Scheme))
@@ -48,4 +70,8 @@ func Parse(rawurl string) (ldapurl *LdapURL, err error) {
 func (ldapurl LdapURL) BuildHostnamePortString() (hostname string) {
 	hostname = fmt.Sprintf("%s:%d", ldapurl.Host, ldapurl.Port)
 	return
+}
+
+func (ldapurl LdapURL) IsTLS() bool {
+	return ldapurl.Scheme == "ldaps"
 }
