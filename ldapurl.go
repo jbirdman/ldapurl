@@ -24,8 +24,8 @@ func Parse(rawurl string) (ldapurl *LdapURL, err error) {
 		return
 	}
 
-	ldapurl.Scheme = u.Scheme
-	ldapurl.Host = u.Host
+	// Start building the object
+	ldapurl = &LdapURL{Scheme:u.Scheme, Host:u.Host, }
 
 	// Check for supported schemes and set port defaults and TLS status appropriately
 	switch u.Scheme {
@@ -36,6 +36,7 @@ func Parse(rawurl string) (ldapurl *LdapURL, err error) {
 	case "ldaps":
 		ldapurl.IsTls = true
 		ldapurl.Port = DefaultLdapsPort
+		break
 	default:
 		err = errors.New(fmt.Sprintf("Unsupported LDAP URL scheme: %s", u.Scheme))
 		return
