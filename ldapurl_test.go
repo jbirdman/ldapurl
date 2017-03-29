@@ -1,8 +1,8 @@
 package ldapurl
 
 import (
-	"testing"
 	"log"
+	"testing"
 )
 
 func TestParseValidURL(t *testing.T) {

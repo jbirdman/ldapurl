@@ -1,15 +1,15 @@
 package ldapurl
 
 import (
-	"net/url"
 	"errors"
 	"fmt"
 	"net"
+	"net/url"
 	"strconv"
 )
 
 const (
-	DefaultLdapPort = 389
+	DefaultLdapPort  = 389
 	DefaultLdapsPort = 636
 )
 
@@ -45,7 +45,7 @@ func Parse(rawurl string) (ldapurl *LdapURL, err error) {
 	host, port := SplitHostPort(u.Host, 0)
 
 	// Start building the object
-	ldapurl = &LdapURL{Scheme:u.Scheme, Host:host}
+	ldapurl = &LdapURL{Scheme: u.Scheme, Host: host}
 
 	// Check for supported schemes and set port defaults and TLS status appropriately
 	switch u.Scheme {
