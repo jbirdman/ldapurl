@@ -1,6 +1,7 @@
 package ldapurl
 
 import (
+	"fmt"
 	"log"
 	"testing"
 )
@@ -63,4 +64,14 @@ func TestLdapURL_BuildHostnamePortString(t *testing.T) {
 	if ldapurl.BuildHostnamePortString() != "ldap.jcu.edu.au:636" {
 		t.Errorf("Hostname port string not correct: %s", ldapurl.BuildHostnamePortString())
 	}
+}
+
+func TestParseFilterURL(t *testing.T) {
+	ldapurl, err := Parse("ldap:///dc=jcu,dc=edu,dc=au??sub?mail=test@jcu.edu.au")
+	if err != nil {
+		log.Fatal(err)
+		t.Errorf("Error doing basic URL parse")
+	}
+
+	fmt.Printf("%+v\n",ldapurl)
 }

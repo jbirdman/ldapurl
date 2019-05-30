@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -14,9 +15,14 @@ const (
 )
 
 type LdapURL struct {
-	Scheme string
-	Host   string
-	Port   int
+	Scheme     string
+	Host       string
+	Port       int
+	DN         string
+	Attributes []string
+	Scope      string
+	Filter     string
+	Extensions []string
 }
 
 func SplitHostPort(hostport string, defaultport int) (host string, port int) {
@@ -62,6 +68,24 @@ func Parse(rawurl string) (ldapurl *LdapURL, err error) {
 	default:
 		err = errors.New(fmt.Sprintf("Unsupported LDAP URL scheme: %s", u.Scheme))
 		return
+	}
+
+	// DN part of the URL
+	ldapurl.DN = strings.TrimPrefix(u.Path, "/")
+
+	parts := strings.Split(u.RawQuery, "?")
+
+	for i, v := range parts {
+		switch i {
+		case 0:
+			ldapurl.Attributes = strings.Split(v,",")
+		case 1:
+			ldapurl.Scope = v
+		case 2:
+			ldapurl.Filter = v
+		case 3:
+			ldapurl.Extensions = strings.Split(v,",")
+		}
 	}
 
 	return
