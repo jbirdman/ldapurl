@@ -1,3 +1,3 @@
-module git.jcu.edu.au/go/ldapurl
+module github.com/jbirdman/ldapurl
 
 go 1.12
